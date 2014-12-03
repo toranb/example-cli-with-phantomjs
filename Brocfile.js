@@ -1,6 +1,7 @@
 /* global require, module */
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+var pickFiles = require('broccoli-static-compiler');
 
 var app = new EmberApp();
 
@@ -21,4 +22,10 @@ if (app.env === 'test') {
     app.import('bower_components/fauxjax/dist/fauxjax.min.js');
 }
 
-module.exports = app.toTree();
+es5Shim = pickFiles('node_modules/es5-shim', {
+  srcDir: '/',
+  files: ['es5-shim.js'],
+  destDir: '/assets'
+});
+
+module.exports = app.toTree([es5Shim]);
