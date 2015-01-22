@@ -6,6 +6,7 @@ export function initialize(container, application) {
     application.inject('route:people', 'repository', 'repositories:person');
     application.inject('route:people/person', 'repository', 'repositories:person');
     application.inject('controller:people/person', 'repository', 'repositories:person');
+    application.inject('controller:add', 'repository', 'repositories:person');
 }
 
 export default {

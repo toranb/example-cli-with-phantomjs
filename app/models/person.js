@@ -4,7 +4,7 @@ var attr = function() {
     var value = '';
     return function(key, val) {
         if (arguments.length === 2) {
-            this.isDirty = true;
+            this.set('isDirty', true);
             value = val;
         }
         return value;
@@ -20,24 +20,17 @@ var Person = Ember.Object.extend({
     },
     firstName: attr(),
     lastName: attr(),
-    enteredWat: {
-        value: '',
-        dirty: false
-    },
+    enteredWat: attr(),
     wat: function() {
-        var value = this.get('enteredWat.value').trim();
-        if(!this.get('enteredWat.dirty')) {
-            this.set('enteredWat.dirty', value.length > 0);
-        }
-        return value;
-    }.property('enteredWat.value'),
+        return this.get('enteredWat').trim();
+    }.property('enteredWat'),
     watError: function() {
         var wat = this.get('wat');
-        var isDirty = this.get('enteredWat.dirty');
+        var isDirty = this.get('isDirty');
         if(!wat && isDirty) {
             return 'please enter a valid wat';
         }
-    }.property('wat', 'enteredWat.dirty'),
+    }.property('wat', 'isDirty'),
     fullName: function() {
         var first = this.get('firstName');
         var last = this.get('lastName');

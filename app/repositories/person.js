@@ -3,7 +3,18 @@ import PromiseMixin from 'example-cli-with-phantomjs/models/promise';
 
 var PersonRepository = Ember.Object.extend({
     save: function(model) {
-        model.save();
+        if(model.get('id')){
+            model.save();
+        }else{
+            var person = {
+                firstName: model.get('firstName'),
+                lastName: model.get('lastName'),
+                wat: model.get('wat')
+            };
+            //xhr -then on the return push into the store
+            var store = this.get("store");
+            store.push("person", person);
+        }
     },
     find: function() {
         var store = this.get("store");
