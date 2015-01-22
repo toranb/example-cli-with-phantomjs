@@ -3,4 +3,7 @@
 {{input value=model.lastName}}
 <b>{{model.fullName}}</b>
 
+{{input type="text" value=model.enteredWat.value}}
+<p class="input-error">{{model.watError}}</p>
+
 <button {{action "save"}}>Save</button>
