@@ -3,7 +3,7 @@ import PromiseMixin from 'example-cli-with-phantomjs/models/promise';
 
 var PersonRepository = Ember.Object.extend({
     save: function(model) {
-        //in the future invoke save on this model
+        model.save();
     },
     find: function() {
         var store = this.get("store");
