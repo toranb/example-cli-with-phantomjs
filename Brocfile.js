@@ -18,9 +18,7 @@ var app = new EmberApp();
 // please specify an object with the list of modules as keys
 // along with the exports of each module as its value.
 
-if (app.env === 'test') {
-    app.import('bower_components/fauxjax/dist/fauxjax.min.js');
-}
+app.import('bower_components/fauxjax/dist/fauxjax.min.js');
 
 es5Shim = pickFiles('node_modules/es5-shim', {
   srcDir: '/',

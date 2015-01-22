@@ -1,3 +1,6 @@
-<button id="go" {{action "go"}}>GO</button>
+{{#each person in controller}}
+  <div>{{#link-to "people.person" person.id}}details{{/link-to}}</div>
+  <div class="name">{{person.fullName}}</div>
+{{/each}}
 
-{{#link-to 'people.person'}}Go To Link{{/link-to}}
+{{outlet}}

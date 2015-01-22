@@ -17,5 +17,13 @@
 
     <script src="assets/vendor.js"></script>
     <script src="assets/example-cli-with-phantomjs.js"></script>
+    <script>
+      var people = [{id: 1, firstName: "first", lastName: "person"}, {id: 2, firstName: "last", lastName: "person"}];
+      $.fauxjax.new({
+        url: '/api/people',
+        dataType: 'json',
+        responseText: people
+      });
+    </script>
   </body>
 </html>
