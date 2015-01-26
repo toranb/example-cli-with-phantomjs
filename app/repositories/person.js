@@ -18,12 +18,17 @@ var PersonRepository = Ember.Object.extend({
     },
     find: function() {
         var store = this.get("store");
-        PromiseMixin.xhr("/api/people", "GET").then(function(response) {
-            response.forEach(function(data) {
-                store.push("person", data);
+        var all = store.find("person");
+        //only doing this to prevent a reload of this static/xhr
+        if (all.length < 1) {
+            PromiseMixin.xhr("/api/people", "GET").then(function(response) {
+                response.forEach(function(data) {
+                    store.push("person", data);
+                });
             });
-        });
-        return store.find("person");
+            return store.find("person");
+        }
+        return all;
     },
     findById: function(id) {
         var store = this.get("store");

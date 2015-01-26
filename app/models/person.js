@@ -1,35 +1,20 @@
 import Ember from 'ember';
 
-//this function is half baked currently
-//if a true computed gets "set" it will break everything
-//looking for a way to identify ONLY the attr fields on the model
-//because we should only clone/restore this specified
-function keyIsSafeToClone(obj, key) {
-    var keyIsPrivate = key.indexOf('_') === -1;
-    var keyIsIdentifier = key.indexOf('id') === -1;
-    var keyIsProtected = key.indexOf('isDirty') === -1;
-    var keyIsFirstName = key.indexOf('firstName') === 0;
-    var keyIsLastName = key.indexOf('lastName') === 0;
-    //var keyIsComputed = key.indexOf('fullName') === 0; **problem here**
-    //if (obj.hasOwnProperty(key) && keyIsPrivate && keyIsIdentifier && keyIsProtected) {
-    if (obj.hasOwnProperty(key) && (keyIsFirstName || keyIsLastName)) {
-        return key;
-    }
-}
-
 function clone(obj) {
     var copy = {};
-    for(var key in obj){
-        if (keyIsSafeToClone(obj, key)) {
+    var factory = obj.get('constructor.ClassMixin.ownerConstructor');
+    factory.eachComputedProperty(function (key, meta) {
+        if (meta.isAttribute) {
             copy[key] = obj.get(key);
         }
-    }
+    });
     return copy;
 }
 
 var attr = function() {
     var value = '';
-    return function(key, val) {
+    var meta = {isAttribute: true};
+    return Ember.computed(function(key, val) {
         if (arguments.length === 2) {
             if (!this.get('isDirty')) {
                 var oldState = clone(this);
@@ -39,12 +24,12 @@ var attr = function() {
             value = val;
         }
         return value;
-    }.property()
+    }).meta(meta);
 };
 
-var Person = Ember.Object.extend({
+var Model = Ember.Object.extend({
     init: function() {
-        this.set("isDirty", false);
+        this.set('isDirty', false);
     },
     rollback: function() {
         var oldState = this.get('_oldState');
@@ -57,7 +42,10 @@ var Person = Ember.Object.extend({
         var oldState = clone(this);
         this.set("_oldState", oldState);
         this.set("isDirty", false);
-    },
+    }
+});
+
+var Person = Model.extend({
     firstName: attr(),
     lastName: attr(),
     enteredWat: attr(),
