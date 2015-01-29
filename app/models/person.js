@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 function clone(obj) {
     var copy = {};
-    var factory = obj.get('constructor.ClassMixin.ownerConstructor');
+    var factory = obj.get("constructor.ClassMixin.ownerConstructor");
     factory.eachComputedProperty(function (key, meta) {
         if (meta.isAttribute) {
             copy[key] = obj.get(key);
@@ -12,53 +12,64 @@ function clone(obj) {
 }
 
 var attr = function() {
-    var value = '';
     var meta = {isAttribute: true};
-    return Ember.computed(function(key, val) {
+    return function(key, value) {
+        var data = this.get("_data") || {};
+        var dirty = this.get("_dirty") || {};
         if (arguments.length === 2) {
-            if (!this.get('isDirty')) {
+            if (!this.get("isDirty")) {
                 var oldState = clone(this);
                 this.set("_oldState", oldState);
             }
-            this.set('isDirty', true);
-            value = val;
+            this.set("isDirty", true);
+            dirty["%@:isDirty".fmt(key)] = true;
+            data[key] = value;
         }
-        return value;
-    }).meta(meta);
+        return data[key];
+    }.property("_data").meta(meta);
 };
 
 var Model = Ember.Object.extend({
     init: function() {
-        this.set('isDirty', false);
+        this.set("_data", {});
+        this._reset();
     },
     rollback: function() {
-        var oldState = this.get('_oldState');
+        var oldState = this.get("_oldState");
         for(var key in oldState){
             this.set(key, oldState[key]);
         }
-        this.set("isDirty", false);
+        this._reset();
     },
     save: function() {
         var oldState = clone(this);
         this.set("_oldState", oldState);
+        this._reset();
+    },
+    _reset: function() {
         this.set("isDirty", false);
+        this.set("_dirty", {});
+    },
+    unknownProperty: function(key) {
+        if (key === "_dirty") { return; }
+        var dirty = this.get("_dirty");
+        if (key.indexOf(":isDirty") > 0) {
+            return dirty[key];
+        }
     }
 });
 
 var Person = Model.extend({
     firstName: attr(),
     lastName: attr(),
-    enteredWat: attr(),
-    wat: function() {
-        return this.get('enteredWat').trim();
-    }.property('enteredWat'),
+    wat: attr(),
     watError: function() {
         var wat = this.get('wat');
-        var isDirty = this.get('isDirty');
+        var isDirty = this.get('wat:isDirty');
         if(!wat && isDirty) {
             return 'please enter a valid wat';
         }
-    }.property('wat', 'isDirty'),
+    }.property('wat'),
     fullName: function() {
         var first = this.get('firstName');
         var last = this.get('lastName');
