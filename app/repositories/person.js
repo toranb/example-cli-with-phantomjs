@@ -1,12 +1,16 @@
 import Ember from 'ember';
 import PromiseMixin from 'example-cli-with-phantomjs/models/promise';
 
+var nextId = 2;
+
 var PersonRepository = Ember.Object.extend({
     save: function(model) {
         if(model.get('id')){
             model.save();
         }else{
+            nextId++;
             var person = {
+                id: nextId,
                 firstName: model.get('firstName'),
                 lastName: model.get('lastName'),
                 wat: model.get('wat')
